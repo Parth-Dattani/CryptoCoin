@@ -13,13 +13,10 @@ import 'api.dart';
 
 class RemoteService {
 
-  String userId = AppConstants.userId;
-
-
   static const String apiKey = "";
 
   static Future<List<CoinModel>> fetchCoinsList() async {
-    final uri = Uri.parse("https://api.coingecko.com/api/v3/coins/list");
+    final uri = Uri.parse("${Apis.baseApi} + ${Apis.coinListApi}");
 
     try {
       final response = await http.get(
@@ -37,17 +34,17 @@ class RemoteService {
         print("Fetched ${data.length} coins");
         return data.map((e) => CoinModel.fromJson(e)).toList();
       } else {
-        throw Exception("Failed to load coins list: ${response.statusCode}");
+        throw Exception("Failed to load coins: ${response.statusCode}");
       }
     } catch (e) {
-      print("Network Error: $e");
+      print("Error: $e");
       rethrow;
     }
   }
 
   static Future<Map<String, dynamic>> fetchCoinPrices(String coinIds) async {
     final uri = Uri.parse(
-      "https://api.coingecko.com/api/v3/simple/price?ids=$coinIds&vs_currencies=usd",
+      "${Apis.baseApi}/simple/price?ids=$coinIds&vs_currencies=usd",
     );
 
     try {
@@ -61,15 +58,15 @@ class RemoteService {
 
       if (response.statusCode == 200) {
         return jsonDecode(response.body);
-      } else {
+      }
+      else {
         throw Exception("Failed to load prices: ${response.statusCode}");
       }
     } catch (e) {
-      print("Price fetch error: $e");
+      print("error: $e");
       rethrow;
     }
   }
-
 
 }
 
