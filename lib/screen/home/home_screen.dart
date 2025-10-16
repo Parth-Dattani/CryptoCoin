@@ -399,28 +399,7 @@ class PortfolioItemCard extends StatelessWidget {
     return Obx((){
       final currentItem = getCurrentItem();
      return GestureDetector(
-       onLongPress: () {
-         // Toggle price up/down for testing
-         final currentItem = getCurrentItem();
-         if (currentItem.price != null) {
-           currentItem.previousPrice = currentItem.price;
-           currentItem.price = currentItem.price! * 1.05; // +5%
-           portfolio.refresh();
-
-
-         }
-       },
-       onDoubleTap: () {
-         // Decrease price
-         final currentItem = getCurrentItem();
-         if (currentItem.price != null) {
-           currentItem.previousPrice = currentItem.price;
-           currentItem.price = currentItem.price! * 0.95; // -5%
-           portfolio.refresh();
-
-
-         }
-       },
+       //
        child: Container(
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
           decoration: BoxDecoration(
