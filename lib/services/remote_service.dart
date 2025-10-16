@@ -15,10 +15,17 @@ class RemoteService {
 
   static const String apiKey = "";
 
-  static Future<List<CoinModel>> fetchCoinsList() async {
-    final uri = Uri.parse("${Apis.baseApi} + ${Apis.coinListApi}");
+  static Future<List<CoinModel>> fetchCoinsListWithMarketData({
+    int page = 1,
+    int perPage = 100,
+  }) async {
+    final uri = Uri.parse(
+        "${Apis.baseApi}/coins/markets?vs_currency=usd&per_page=$perPage&page=$page"
+    );
 
     try {
+      print("coins: $uri");
+
       final response = await http.get(
         uri,
         headers: {
@@ -31,13 +38,13 @@ class RemoteService {
 
       if (response.statusCode == 200) {
         final List<dynamic> data = jsonDecode(response.body);
-        print("Fetched ${data.length} coins");
+        print("Fetched ${data.length} coins ");
         return data.map((e) => CoinModel.fromJson(e)).toList();
       } else {
         throw Exception("Failed to load coins: ${response.statusCode}");
       }
     } catch (e) {
-      print("Error: $e");
+      print(" Error fetching coins: $e");
       rethrow;
     }
   }

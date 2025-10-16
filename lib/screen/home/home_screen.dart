@@ -433,7 +433,6 @@ class PortfolioItemCard extends StatelessWidget {
                     Expanded(
                       child: Row(
                         children: [
-                          // Coin Avatar
                           Hero(
                             tag: 'coin_${item.coinId}',
                             child: Container(
@@ -455,16 +454,71 @@ class PortfolioItemCard extends StatelessWidget {
                                   ),
                                 ],
                               ),
-                              child: Center(
-                                child: Text(
-                                  item.symbol.isNotEmpty
-                                      ? item.symbol.substring(0, 1).toUpperCase()
-                                      : '?',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 20,
-                                  ),
+                              child: ClipOval(
+                                child: Builder(
+                                  builder: (context) {
+                                    final controller = Get.find<HomeController>();
+                                    final coin = controller.coinMap[item.coinId.toLowerCase()];
+
+                                    if (coin?.image != null && coin!.image!.isNotEmpty) {
+                                      return Image.network(
+                                        coin.image!,
+                                        width: 48,
+                                        height: 48,
+                                        fit: BoxFit.cover,
+                                        loadingBuilder: (context, child, loadingProgress) {
+                                          if (loadingProgress == null) return child;
+                                          return Center(
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              valueColor: AlwaysStoppedAnimation<Color>(
+                                                Colors.white.withOpacity(0.5),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return Container(
+                                            width: 48,
+                                            height: 48,
+                                            decoration: const BoxDecoration(
+                                              gradient: LinearGradient(
+                                                colors: [
+                                                  Color(0xFF6366F1),
+                                                  Color(0xFF8B5CF6),
+                                                ],
+                                              ),
+                                            ),
+                                            child: Center(
+                                              child: Text(
+                                                item.symbol.isNotEmpty
+                                                    ? item.symbol.substring(0, 1).toUpperCase()
+                                                    : '?',
+                                                style: const TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 20,
+                                                ),
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      );
+                                    } else {
+                                      return Center(
+                                        child: Text(
+                                          item.symbol.isNotEmpty
+                                              ? item.symbol.substring(0, 1).toUpperCase()
+                                              : '?',
+                                          style: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 20,
+                                          ),
+                                        ),
+                                      );
+                                    }
+                                  },
                                 ),
                               ),
                             ),
@@ -493,11 +547,11 @@ class PortfolioItemCard extends StatelessWidget {
                                           fontSize: 13,
                                           color: Colors.white.withOpacity(0.5),
                                           fontWeight: FontWeight.w500,
-                                          overflow: TextOverflow.clip
+                                          overflow: TextOverflow.clip,
                                         ),
                                       ),
                                     ),
-                                    // **NEW: Real-time price change badge**
+
                                     Obx(() {
                                       final currentItem = getCurrentItem();
                                       if (currentItem.hasPriceChanged) {
@@ -510,8 +564,8 @@ class PortfolioItemCard extends StatelessWidget {
                                             ),
                                             decoration: BoxDecoration(
                                               color: currentItem.isPriceUp
-                                                  ? const Color(0xFF00C853).withOpacity(0.2)
-                                                  : const Color(0xFFFF4444).withOpacity(0.2),
+                                                  ? AppColors.greenColor.withOpacity(0.2)
+                                                  : AppColors.errorColor.withOpacity(0.2),
                                               borderRadius: BorderRadius.circular(8),
                                             ),
                                             child: Row(
@@ -523,8 +577,8 @@ class PortfolioItemCard extends StatelessWidget {
                                                       : Icons.arrow_drop_down,
                                                   size: 12,
                                                   color: currentItem.isPriceUp
-                                                      ? const Color(0xFF00C853)
-                                                      : const Color(0xFFFF4444),
+                                                      ? AppColors.greenColor
+                                                      : AppColors.errorColor,
                                                 ),
                                                 Text(
                                                   "${currentItem.priceChangePercentage.abs().toStringAsFixed(2)}%",
@@ -532,8 +586,8 @@ class PortfolioItemCard extends StatelessWidget {
                                                     fontSize: 9,
                                                     fontWeight: FontWeight.bold,
                                                     color: currentItem.isPriceUp
-                                                        ? const Color(0xFF00C853)
-                                                        : const Color(0xFFFF4444),
+                                                        ? AppColors.greenColor
+                                                        : AppColors.errorColor,
                                                   ),
                                                 ),
                                               ],
@@ -552,7 +606,7 @@ class PortfolioItemCard extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    // Total Value and Profit/Loss
+
                     Obx(() {
                       final currentItem = getCurrentItem();
 
@@ -592,7 +646,6 @@ class PortfolioItemCard extends StatelessWidget {
                               ),
                             ),
 
-                          // Profit/Loss indicator (based on purchase price)
                           if (currentItem.price != null &&
                               currentItem.price! > 0 &&
                               currentItem.purchasePrice != null &&
@@ -623,8 +676,8 @@ class PortfolioItemCard extends StatelessWidget {
                                         : Icons.arrow_downward,
                                     size: 12,
                                     color: currentItem.isProfit
-                                        ? const Color(0xFF00C853)
-                                        : const Color(0xFFFF4444),
+                                        ? AppColors.greenColor
+                                        : AppColors.errorColor,
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
@@ -633,8 +686,8 @@ class PortfolioItemCard extends StatelessWidget {
                                       fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                       color: currentItem.isProfit
-                                          ? const Color(0xFF00C853)
-                                          : const Color(0xFFFF4444),
+                                          ? AppColors.greenColor
+                                          : AppColors.errorColor,
                                     ),
                                   ),
                                 ],
@@ -650,10 +703,8 @@ class PortfolioItemCard extends StatelessWidget {
                 Divider(height: 1, color: Colors.white.withOpacity(0.1)),
                 const SizedBox(height: 16),
 
-                // Price and Quantity Row with GREEN/RED price change
                 Row(
                   children: [
-                    // Current Price with LIVE change indicator
                     Expanded(
                       child: Obx(() {
                         final currentItem = getCurrentItem();
@@ -693,7 +744,6 @@ class PortfolioItemCard extends StatelessWidget {
                                       ),
                                     ),
                                   ),
-                                  // **NEW: Small indicator icon**
                                   if (currentItem.hasPriceChanged)
                                     Icon(
                                       currentItem.isPriceUp
@@ -701,8 +751,8 @@ class PortfolioItemCard extends StatelessWidget {
                                           : Icons.trending_down,
                                       size: 14,
                                       color: currentItem.isPriceUp
-                                          ? const Color(0xFF00C853)
-                                          : const Color(0xFFFF4444),
+                                          ? AppColors.greenColor
+                                          : AppColors.errorColor,
                                     ),
                                 ],
                               ),
@@ -723,21 +773,21 @@ class PortfolioItemCard extends StatelessWidget {
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
                                 ),
-                                // **NEW: Show actual price change amount**
                                 if (currentItem.hasPriceChanged) ...[
                                   const SizedBox(height: 4),
                                   Text(
-                                    "${currentItem.isPriceUp ? '+' : ''}\$${currentItem.priceChange.toStringAsFixed(5)}",
+                                    "${currentItem.isPriceUp ? '+' : ''}\$${currentItem.priceChange.toStringAsFixed(2)}",
                                     style: TextStyle(
                                       fontSize: 10,
                                       fontWeight: FontWeight.w600,
                                       color: currentItem.isPriceUp
-                                          ? const Color(0xFF00C853)
-                                          : const Color(0xFFFF4444),
+                                          ? AppColors.greenColor
+                                          : AppColors.errorColor,
                                     ),
                                   ),
                                 ],
-                              ] else
+                              ]
+                              else
                                 Text(
                                   "Loading...",
                                   style: TextStyle(
@@ -752,7 +802,6 @@ class PortfolioItemCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
 
-                    // Purchase Price
                     Expanded(
                       child: Container(
                         padding: const EdgeInsets.all(12),
@@ -785,7 +834,7 @@ class PortfolioItemCard extends StatelessWidget {
                               )
                             else
                               Text(
-                                "N/A",
+                                "-",
                                 style: TextStyle(
                                   fontSize: 13,
                                   color: Colors.white.withOpacity(0.3),
@@ -797,7 +846,6 @@ class PortfolioItemCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
 
-                    // Quantity
                     Expanded(
                       child: Container(
                         padding: const EdgeInsets.all(12),
@@ -834,7 +882,6 @@ class PortfolioItemCard extends StatelessWidget {
                   ],
                 ),
 
-                // Profit/Loss Details (if available)
                 Obx(() {
                   final currentItem = getCurrentItem();
 
